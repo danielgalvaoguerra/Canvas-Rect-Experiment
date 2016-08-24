@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<HTML>
+  <BODY>
+    <h3> 2D Quadrilateral Vertex Experiment </h3>
+    <p> Click and drag the rectangle edges to shape the rectangle </p>
+    <p> Click and drag the rectangle itself to move it around </p>
+
+    <canvas id="canvas" width="500" height="300"
+        onmousedown="onMouseDown(event)" onmouseup="OnMouseUp(event)" onmousemove="onMouseMove(event)"
+        style="border:1px solid #000000;">
+    </canvas>
+
+    <script>
+      var canvasWidth = 500;
+      var canvasHeight = 300;
+
+      // x and y position of each edge
+      var xLeft = 150;
+      var xRight = 350;
+      var yUp = 50;
+      var yDown = 250;
+      var rectWidth = xRight - xLeft;
+      var rectHeight = yDown - yUp;
+
+      // variable for the how close to the edge the cursor has to be
+      var bounds = 7;
+
+      //  variable to know which side is currently selected/hovered on
+      var selectedSide = "none";
+      var hoverSide = "none";
+
+      // mouse variables
+      var mouseX;
+      var mouseY;
+      var tempPosX;
+      var tempPosY;
+      var xPosDiff;
+      var yPosDiff;
+      var mouseDown = false;
+
+      // getting information to be able to draw stuff on canvas
+      var c = document.getElementById("canvas");
+      var context = c.getContext("2d");
+      context.fillStyle = "#0000FF";
+      context.fillRect(xLeft, canvasHeight/2 - rectHeight/2, rectWidth, rectHeight); //fillRect(xTopLeft, yTopLeft, rectWidth, rectHeight)
+      var canvasRect = c.getBoundingClientRect();
+
+      function onMouseDown(event){
+        selectedSide = hoverSide;
+        mouseDown = true;
+        tempPosX = mouseX;
+        tempPosY = mouseY;
+      }
+
+      function drawCurrentRect(){
+        context.fillStyle = "#FFFFFF";
+        context.fillRect(0,0,canvasWidth,canvasHeight); // draw white background to clear previous shape
+
+        context.fillStyle = "#0000FF";
+        context.fillRect(xLeft, yUp, rectWidth, rectHeight); // main rect
+      }
+
+      function onMouseMove(event){
+        // from html5canvastutorials: to get the mouse position on canvas subtract client position from canvas rect top left
+        mouseX = event.clientX - canvasRect.left;
+        mouseY = event.clientY - canvasRect.top;
+
+        hoverSide = "none";
+        drawCurrentRect();
+
+        if(mouseX <= xLeft+bounds && mouseX >= xLeft-bounds){
+          context.fillStyle = "#C3C3C3";
+          context.fillRect(xLeft-bounds, yUp, bounds, rectHeight);
+          hoverSide = "left";
+        }
+        else if(mouseX <= xRight+bounds && mouseX >= xRight-bounds){
+          context.fillStyle = "#C3C3C3";
+          context.fillRect(xRight, yUp, bounds, rectHeight);
+          hoverSide = "right";
+        }
+        else if(mouseY <= yUp+bounds && mouseY >= yUp-bounds){
+          context.fillStyle = "#C3C3C3";
+          context.fillRect(xLeft, yUp-bounds, rectWidth, bounds);
+          hoverSide = "up";
+        }
+        else if(mouseY <= yDown+bounds && mouseY >= yDown-bounds){
+          context.fillStyle = "#C3C3C3";
+          context.fillRect(xLeft, yDown, rectWidth, bounds);
+          hoverSide = "down";
+        }
+
+        if(mouseDown == true)
+        {
+          if(selectedSide == "left")
+          {
+            xLeft = mouseX;
+            rectWidth = xRight - xLeft;
+          }
+          else if(selectedSide == "right")
+          {
+            xRight = mouseX;
+            rectWidth = xRight - xLeft;
+          }
+          else if(selectedSide == "up")
+          {
+            yUp = mouseY;
+            rectHeight = yDown - yUp;
+          }
+          else if(selectedSide == "down")
+          {
+            yDown = mouseY;
+            rectHeight = yDown - yUp;
+          }
+          else if(selectedSide == "none")
+          {
+            xPosDiff = mouseX - tempPosX;
+            yPosDiff = mouseY - tempPosY;
+            xLeft += xPosDiff;
+            xRight += xPosDiff;
+            yUp += yPosDiff;
+            yDown += yPosDiff;
+            rectWidth = xRight - xLeft;
+            rectHeight = yDown - yUp;
+            tempPosX = mouseX;
+            tempPosY = mouseY;
+          }
+          drawCurrentRect();
+        }
+      }
+
+      function OnMouseUp(event){
+        selectedSide = "none";
+        mouseDown = false;
+      }
+
+    </script>
+
+  </BODY>
+</HTML>
